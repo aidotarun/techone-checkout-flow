@@ -49,7 +49,12 @@ const PaymentGateway = () => {
   };
 
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
-  const [editedCustomer, setEditedCustomer] = useState(customerData);
+  const [editedCustomer, setEditedCustomer] = useState({
+    name: 'John Smith',
+    email: 'john.smith@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Tech Street, San Francisco, CA 94105'
+  });
   const [orderBreakdown, setOrderBreakdown] = useState({
     subtotal: 249.99,
     tax: 25.00,
