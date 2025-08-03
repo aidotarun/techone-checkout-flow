@@ -11,7 +11,10 @@ import {
   ExternalLink,
   Copy,
   Check,
-  Info
+  Info,
+  Edit,
+  Save,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +33,30 @@ const PaymentGateway = () => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  const orderData = {
+    orderId: 'ORD-2024-001523',
+    transactionId: 'TXN-PGX-789456123',
+    productName: 'Premium Software License',
+    amount: 299.99,
+    currency: 'USD'
+  };
+
+  const customerData = {
+    name: 'John Smith',
+    email: 'john.smith@example.com',
+    phone: '+1 (555) 123-4567',
+    address: '123 Tech Street, San Francisco, CA 94105'
+  };
+
+  const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+  const [editedCustomer, setEditedCustomer] = useState(customerData);
+  const [orderBreakdown, setOrderBreakdown] = useState({
+    subtotal: 249.99,
+    tax: 25.00,
+    processingFee: 15.00,
+    discount: -10.00
+  });
+
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
@@ -45,20 +72,22 @@ const PaymentGateway = () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const orderData = {
-    orderId: 'ORD-2024-001523',
-    transactionId: 'TXN-PGX-789456123',
-    productName: 'Premium Software License',
-    amount: 299.99,
-    currency: 'USD'
+  const saveCustomerInfo = () => {
+    // In a real app, this would save to a database
+    console.log('Saving customer info:', editedCustomer);
+    setIsEditingCustomer(false);
   };
 
-  const customerData = {
-    name: 'John Smith',
-    email: 'john.smith@example.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Tech Street, San Francisco, CA 94105'
+  const cancelEditCustomer = () => {
+    setEditedCustomer(customerData);
+    setIsEditingCustomer(false);
   };
+
+  const handleCustomerFieldChange = (field: string, value: string) => {
+    setEditedCustomer(prev => ({ ...prev, [field]: value }));
+  };
+
+  const totalAmount = orderBreakdown.subtotal + orderBreakdown.tax + orderBreakdown.processingFee + orderBreakdown.discount;
 
   return (
     <TooltipProvider>
@@ -92,8 +121,12 @@ const PaymentGateway = () => {
         <div className="max-w-4xl mx-auto p-4 pb-32 md:pb-8">
           {/* Merchant Details Section */}
           <div className="premium-card p-6 mb-6 animate-fade-in">
+            <div className="text-center mb-4">
+              <p className="text-sm text-muted-foreground mb-3">You are paying to</p>
+            </div>
+            
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 w-full justify-center md:justify-start">
                 <img 
                   src={techoneLogo} 
                   alt="TechOne Online" 
@@ -178,44 +211,137 @@ const PaymentGateway = () => {
                   
                   <Separator className="my-4" />
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">{orderData.productName}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center text-lg font-bold">
-                    <span>Total Amount</span>
-                    <span className="gradient-primary bg-clip-text text-transparent">
-                      ${orderData.amount} {orderData.currency}
-                    </span>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">{orderData.productName}</span>
+                      <span className="text-sm">${orderBreakdown.subtotal}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Tax (10%)</span>
+                      <span>${orderBreakdown.tax}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Processing Fee</span>
+                      <span>${orderBreakdown.processingFee}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-success">Discount Applied</span>
+                      <span className="text-success">${orderBreakdown.discount}</span>
+                    </div>
+                    
+                    <Separator className="my-3" />
+                    
+                    <div className="flex justify-between items-center text-lg font-bold">
+                      <span>Total Amount</span>
+                      <span className="gradient-primary bg-clip-text text-transparent">
+                        ${totalAmount.toFixed(2)} {orderData.currency}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Customer Details */}
               <div className="premium-card p-6 animate-slide-up">
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-accent"></div>
-                  Customer Information
-                </h2>
-                
-                <div className="space-y-3 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Name:</span>
-                    <span className="ml-2 font-medium">{customerData.name}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Email:</span>
-                    <span className="ml-2 font-medium">{customerData.email}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Phone:</span>
-                    <span className="ml-2 font-medium">{customerData.phone}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Address:</span>
-                    <span className="ml-2 font-medium">{customerData.address}</span>
-                  </div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-accent"></div>
+                    Customer Information
+                  </h2>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => isEditingCustomer ? saveCustomerInfo() : setIsEditingCustomer(true)}
+                    className="flex items-center gap-2"
+                  >
+                    {isEditingCustomer ? (
+                      <>
+                        <Save className="w-3 h-3" />
+                        Save
+                      </>
+                    ) : (
+                      <>
+                        <Edit className="w-3 h-3" />
+                        Edit
+                      </>
+                    )}
+                  </Button>
                 </div>
+                
+                {isEditingCustomer ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="editName" className="text-sm font-medium">Full Name</Label>
+                      <Input
+                        id="editName"
+                        value={editedCustomer.name}
+                        onChange={(e) => handleCustomerFieldChange('name', e.target.value)}
+                        className="input-premium mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editEmail" className="text-sm font-medium">Email Address</Label>
+                      <Input
+                        id="editEmail"
+                        type="email"
+                        value={editedCustomer.email}
+                        onChange={(e) => handleCustomerFieldChange('email', e.target.value)}
+                        className="input-premium mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editPhone" className="text-sm font-medium">Phone Number</Label>
+                      <Input
+                        id="editPhone"
+                        value={editedCustomer.phone}
+                        onChange={(e) => handleCustomerFieldChange('phone', e.target.value)}
+                        className="input-premium mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="editAddress" className="text-sm font-medium">Address</Label>
+                      <Input
+                        id="editAddress"
+                        value={editedCustomer.address}
+                        onChange={(e) => handleCustomerFieldChange('address', e.target.value)}
+                        className="input-premium mt-1"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelEditCustomer}
+                        className="flex items-center gap-2"
+                      >
+                        <X className="w-3 h-3" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Name:</span>
+                      <span className="ml-2 font-medium">{editedCustomer.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Email:</span>
+                      <span className="ml-2 font-medium">{editedCustomer.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Phone:</span>
+                      <span className="ml-2 font-medium">{editedCustomer.phone}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Address:</span>
+                      <span className="ml-2 font-medium">{editedCustomer.address}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -242,7 +368,7 @@ const PaymentGateway = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold gradient-primary bg-clip-text text-transparent">
-                    ${orderData.amount}
+                    ${totalAmount.toFixed(2)}
                   </span>
                   <ChevronDown className={`w-4 h-4 transition-transform ${expandedSection === 'order' ? 'rotate-180' : ''}`} />
                 </div>
@@ -342,7 +468,7 @@ const PaymentGateway = () => {
         <div className="sticky-bottom md:hidden">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">Total Amount</span>
-            <span className="text-xl font-bold">${orderData.amount} {orderData.currency}</span>
+            <span className="text-xl font-bold">${totalAmount.toFixed(2)} {orderData.currency}</span>
           </div>
           <Button className="btn-primary w-full h-14 text-lg font-semibold">
             Complete Payment
@@ -427,7 +553,7 @@ const PaymentMethodsSection = ({ paymentMethod, setPaymentMethod }: {
       {/* Pay Button for Desktop */}
       <div className="hidden md:block mt-8">
         <Button className="btn-primary w-full h-14 text-lg font-semibold">
-          Complete Payment - $299.99 USD
+          Complete Payment - ${(249.99 + 25.00 + 15.00 - 10.00).toFixed(2)} USD
         </Button>
         
         <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
