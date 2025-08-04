@@ -16,6 +16,7 @@ import {
   Save,
   X
 } from 'lucide-react';
+import EnhancedPaymentHeader from './EnhancedPaymentHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -124,49 +125,15 @@ const PaymentGateway = () => {
         </div>
 
         <div className="max-w-4xl mx-auto p-4 pb-32 md:pb-8">
-          {/* Merchant Details Section */}
-          <div className="premium-card p-6 mb-6 animate-fade-in">
-            <div className="text-center mb-4">
-              <p className="text-sm text-muted-foreground mb-3">You are paying to</p>
-            </div>
-            
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4 w-full justify-center md:justify-start">
-                <img 
-                  src={techoneLogo} 
-                  alt="TechOne Online" 
-                  className="w-12 h-12 rounded-xl object-cover"
-                />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-xl font-bold text-foreground">TechOne Online</h1>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="verified-glow">
-                          <Badge className="badge-success">
-                            <Shield className="w-3 h-3 mr-1" />
-                            Verified
-                          </Badge>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Verified Merchant</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <a 
-                    href="https://techoneonline.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                  >
-                    techoneonline.com
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Enhanced Payment Header */}
+          <EnhancedPaymentHeader
+            merchantName="TechOne Online"
+            merchantLogo={techoneLogo}
+            merchantUrl="https://techoneonline.com"
+            isVerified={true}
+            amount={totalAmount}
+            currency={orderData.currency}
+          />
 
           {/* Desktop Layout */}
           <div className="hidden md:grid md:grid-cols-2 md:gap-6">
