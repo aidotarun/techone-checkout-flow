@@ -6,6 +6,8 @@
 
 **Live Project URL**:https://techone-checkout-flow.lovable.app
 
+**GIT Repo URL** https://github.com/aidotarun/techone-checkout-flow
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
