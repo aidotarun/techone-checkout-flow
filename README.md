@@ -4,6 +4,8 @@
 
 **URL**: https://lovable.dev/projects/5fd157a2-e4a3-4456-b55b-b28c7a9d2dbb
 
+**Live Project URL**:https://techone-checkout-flow.lovable.app
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
