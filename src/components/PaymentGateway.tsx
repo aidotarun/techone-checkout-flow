@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Shield, 
   ChevronDown, 
@@ -14,7 +14,11 @@ import {
   Info,
   Edit,
   Save,
-  X
+  X,
+  Receipt,
+  ShoppingCart,
+  FileText,
+  Download
 } from 'lucide-react';
 import EnhancedPaymentHeader from './EnhancedPaymentHeader';
 import { Button } from '@/components/ui/button';
@@ -33,6 +37,23 @@ const PaymentGateway = () => {
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Dynamic header messages and icons for Order Summary
+  const orderSummaryMessages = [
+    { text: "Your purchase breakdown", icon: Receipt },
+    { text: "Order details at a glance", icon: ShoppingCart },
+    { text: "Transaction summary", icon: FileText },
+    { text: "Secure payment overview", icon: Shield }
+  ];
+
+  // Rotate messages every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % orderSummaryMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const orderData = {
     orderId: 'ORD-2024-001523',
@@ -93,6 +114,11 @@ const PaymentGateway = () => {
     setEditedCustomer(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleDownloadInvoice = () => {
+    // Placeholder for download functionality
+    console.log('Download invoice functionality to be implemented');
+  };
+
   const totalAmount = orderBreakdown.subtotal + orderBreakdown.tax + orderBreakdown.processingFee + orderBreakdown.discount;
 
   return (
@@ -141,10 +167,40 @@ const PaymentGateway = () => {
             <div className="space-y-6">
               {/* Order Summary */}
               <div className="premium-card p-6 animate-slide-up">
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  Order Summary
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      {orderSummaryMessages.map((message, index) => {
+                        const IconComponent = message.icon;
+                        return (
+                          <IconComponent
+                            key={index}
+                            className={`w-5 h-5 text-primary absolute transition-all duration-500 ${
+                              index === messageIndex 
+                                ? 'opacity-100 scale-100 rotate-0' 
+                                : 'opacity-0 scale-75 rotate-12'
+                            }`}
+                          />
+                        );
+                      })}
+                    </div>
+                    <h2 className="text-lg font-semibold">
+                      <span 
+                        className="gradient-primary bg-clip-text text-transparent transition-all duration-500"
+                        key={messageIndex}
+                      >
+                        {orderSummaryMessages[messageIndex].text}
+                      </span>
+                    </h2>
+                  </div>
+                  <button
+                    onClick={handleDownloadInvoice}
+                    className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all duration-200 hover:scale-105 group"
+                    title="Download Invoice"
+                  >
+                    <Download className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </button>
+                </div>
                 
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
@@ -334,11 +390,42 @@ const PaymentGateway = () => {
                 onClick={() => toggleSection('order')}
                 className="w-full p-4 text-left flex items-center justify-between"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  <span className="font-semibold">Order Summary</span>
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    {orderSummaryMessages.map((message, index) => {
+                      const IconComponent = message.icon;
+                      return (
+                        <IconComponent
+                          key={index}
+                          className={`w-4 h-4 text-primary absolute transition-all duration-500 ${
+                            index === messageIndex 
+                              ? 'opacity-100 scale-100 rotate-0' 
+                              : 'opacity-0 scale-75 rotate-12'
+                          }`}
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="flex flex-col">
+                    <span 
+                      className="font-semibold gradient-primary bg-clip-text text-transparent transition-all duration-500"
+                      key={messageIndex}
+                    >
+                      {orderSummaryMessages[messageIndex].text}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownloadInvoice();
+                    }}
+                    className="p-1.5 rounded-lg bg-muted/50 hover:bg-muted transition-all duration-200 hover:scale-105 group mr-2"
+                    title="Download Invoice"
+                  >
+                    <Download className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </button>
                   <span className="text-lg font-bold gradient-primary bg-clip-text text-transparent">
                     ${totalAmount.toFixed(2)}
                   </span>
